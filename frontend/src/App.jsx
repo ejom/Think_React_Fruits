@@ -26,33 +26,56 @@ const PRODUCTS = [
 ];
 
 function MainScreen() {
+  const [filter, setFilter] = useState('');
+  const [stockedCheck, setStockedCheck] = useState(false);
+
   return (
       <>
-        <SearchBar />
+        <SearchBar 
+          setFilter={setFilter}
+          setStocked={setStockedCheck}
+        />
         <ProductTable 
           products={PRODUCTS}
+          filter={filter}
+          stocked={stockedCheck}
         />
       </>
   )
 }
 
-function SearchBar() {
+function SearchBar({ setFilter, setStocked }) {
   return (
     <form>
-      <input type="text" placeholder="Search..." />
+      <input 
+        type="text" 
+        placeholder="Search..." 
+        onChange={(event) => setFilter(event.target.value)}
+      />
       <label>
-        <input type="checkbox" />
+        <input 
+          type="checkbox" 
+          onChange={(event) => setStocked(event.target.checked)}
+        />
         Only show products in stock
       </label>
     </form>
   )
 }
 
-function ProductTable({ products }) {
+function ProductTable({ products, filter, stocked }) {
   const rows = [];
   let lastCategory = null;
 
   products.forEach(product => {
+    if (!(product.name.toLowerCase().includes(filter.toLowerCase()))) {
+      return;
+    }
+
+    if (stocked && !(product.stocked)) {
+      return;
+    }
+
     if (product.category != lastCategory) {
       rows.push(
         <ProductCategory 
